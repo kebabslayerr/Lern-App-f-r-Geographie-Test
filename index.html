@@ -1,1 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Österreich Geographie Lern-Profi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .option-btn:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden min-h-screen">
 
+    <div id="app" class="max-w-2xl mx-auto p-4 md:p-8 relative">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg text-white shadow-md">
+                    <i data-lucide="graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 id="rank-name" class="text-sm font-black uppercase tracking-tighter text-slate-400">Level: Geo-Starter</h1>
+                    <div class="flex items-center gap-2">
+                        <div class="bg-amber-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i data-lucide="star" class="w-3 h-3 text-amber-500 fill-amber-500"></i>
+                            <span id="total-xp" class="text-xs font-bold text-amber-700">0 XP</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="showMenu()" id="home-btn" class="hidden p-2 hover:bg-slate-100 rounded-full transition-colors">
+                <i data-lucide="home" class="text-slate-400"></i>
+            </button>
+            <div id="rank-icon" class="text-2xl">🌱</div>
+        </header>
+
+        <main id="main-content">
+            <!-- Content wird dynamisch geladen -->
+        </main>
+    </div>
+
+    <script>
+        const APP_DATA = [
+            {
+                category: "Bevölkerung & Vielfalt",
+                studyContent: [
+                    { title: "Bevölkerungsstand", text: "Die Anzahl der Menschen an einem Ort zu einem Zeitpunkt. In Österreich ca. 9,2 Millionen." },
+                    { title: "Die Bilanzen", text: "Geburtenbilanz (Geburten - Tode) & Wanderungsbilanz (Zuzug - Wegzug). Zusammen ergeben sie die Bevölkerungsbilanz." },
+                    { title: "Stadt vs. Land", text: "Städte wachsen oft stark (Jobs, Ausbildung), ländliche Gebiete nehmen eher ab." },
+                    { title: "Vielfalt", text: "Anerkannte Volksgruppen (Kroaten, Ungarn, etc.) haben Rechte auf Muttersprache und zweisprachige Ortstafeln." }
+                ],
+                questions: [
+                    { question: "Was bedeutet 'Bevölkerungsstand'?", options: ["Anzahl Geburten", "Personenanzahl zu einem Zeitpunkt an einem Ort", "Anzahl der Urlauber"], correct: 1, explanation: "Es ist die aktuelle Personenzahl an einem fixen Ort." },
+                    { question: "Wann ist die Wanderungsbilanz negativ?", options: ["Mehr ziehen weg als zu", "Mehr Tode als Geburten", "Keine Zuwanderung"], correct: 0, explanation: "Negativ heißt, der Ort verliert Leute durch Abwanderung." },
+                    { question: "Wie berechnet man die Bevölkerungsbilanz?", options: ["Geburten + Zuzug", "Bilanz A - Bilanz B", "Geburtenbilanz + Wanderungsbilanz"], correct: 2, explanation: "Beide Bilanzen zusammen zeigen das Gesamtwachstum." },
+                    { question: "Wo ist die Zunahme in Österreich oft am stärksten?", options: ["In den Alpen", "In Städten", "Im Waldviertel"], correct: 1, explanation: "Städte locken durch Jobs und Schulen." },
+                    { question: "Aus welchen Ländern kommen viele Zuwanderer?", options: ["USA / China", "Deutschland / Türkei", "Japan / Kanada"], correct: 1, explanation: "Das sind die laut Unterlagen häufigsten Herkunftsländer." }
+                ]
+            },
+            {
+                category: "Demographie & Alterung",
+                studyContent: [
+                    { title: "Entwicklung", text: "Österreichs Bevölkerung wird immer älter (Alterung)." },
+                    { title: "Kinderzahl", text: "Früher oft 6 oder mehr Kinder pro Familie, heute meist nur noch 1 bis 2." },
+                    { title: "Lebenserwartung", text: "Früher starben Menschen jung (Hygiene, harte Arbeit). Heute leben wir länger durch bessere Medizin." },
+                    { title: "Folge", text: "Immer weniger junge Arbeiter müssen die Pensionen von immer mehr alten Menschen bezahlen." }
+                ],
+                questions: [
+                    { question: "Wie viele Kinder hatten Familien vor 100 Jahren oft?", options: ["Gar keine", "Meist 1-2", "Oft 6 oder mehr"], correct: 2, explanation: "Damals waren Großfamilien ganz normal." },
+                    { question: "Warum werden Menschen heute viel älter?", options: ["Medizinischer Fortschritt", "Mehr Schlaf", "Wegen der Sonne"], correct: 0, explanation: "Bessere Medizin und Arbeitsbedingungen erhöhen die Lebenszeit." },
+                    { question: "Was ist eine Folge der Alterung?", options: ["Frühere Pension für alle", "Weniger Arbeiter finanzieren mehr Pensionen", "Schulen werden teurer"], correct: 1, explanation: "Das Pensionssystem kommt unter finanziellen Druck." }
+                ]
+            },
+            {
+                category: "Pension & Vorsorge",
+                studyContent: [
+                    { title: "Antrittsalter", text: "Das Pensionsalter steigt, damit das System finanzierbar bleibt." },
+                    { title: "Höhe der Pension", text: "Abhängig von Arbeitsjahren, Einkommen und dem Alter beim Start." },
+                    { title: "3 Säulen", text: "1. Staatlich (Pflicht), 2. Betrieblich (Zusatz vom Chef), 3. Privat (Selbst sparen)." }
+                ],
+                questions: [
+                    { question: "Was ist die 1. Säule der Vorsorge?", options: ["Sparbuch", "Staatliche Pensionsversicherung", "Bargeld zu Hause"], correct: 1, explanation: "Die staatliche Säule ist die Pflicht-Basis für alle." },
+                    { question: "Was beeinflusst die Pensionshöhe?", options: ["Haarfarbe", "Arbeitsjahre & Einkommen", "Anzahl der Freunde"], correct: 1, explanation: "Leistung und Einzahlungsdauer bestimmen die Rente." }
+                ]
+            },
+            {
+                category: "Wohlstand & Armut",
+                studyContent: [
+                    { title: "Internet-Schein", text: "Social Media zeigt oft nur Luxus. Das ist nicht die echte Realität aller Menschen." },
+                    { title: "Armut in AT", text: "Jeder 7. ist gefährdet (ca. 1,3 Mio.). Besonders Alleinerzieher und kinderreiche Familien." },
+                    { title: "Sparen", text: "Geringes Einkommen wird komplett für Miete, Strom und Essen gebraucht. Sparen ist dann unmöglich." },
+                    { title: "Verteilung", text: "Das reichste Drittel bekommt 48% des Einkommens-Kuchens." }
+                ],
+                questions: [
+                    { question: "Wie viele Menschen sind in AT armutsgefährdet?", options: ["Jeder 2.", "Jeder 7.", "Niemand"], correct: 1, explanation: "Das sind statistisch etwa 1,3 Millionen Menschen." },
+                    { question: "Warum ist Sparen bei wenig Geld schwer?", options: ["Keine Lust", "Geld wird für Grundbedürfnisse gebraucht", "Banken sind zu weit weg"], correct: 1, explanation: "Fixkosten wie Miete fressen das kleine Einkommen auf." },
+                    { question: "Wie viel Prozent bekommt das reichste Drittel?", options: ["33%", "48%", "90%"], correct: 1, explanation: "Fast die Hälfte des Geldes geht an das reichste Drittel." }
+                ]
+            }
+        ];
+
+        let state = {
+            totalXp: 0,
+            streak: 0,
+            currentCatIndex: null,
+            currentIndex: 0,
+            score: 0,
+            isAnswered: false
+        };
+
+        function updateHeader() {
+            document.getElementById('total-xp').innerText = `${state.totalXp} XP`;
+            let rank = { name: "Geo-Starter", icon: "🌱" };
+            if (state.totalXp >= 300) rank = { name: "Geo-Legende", icon: "👑" };
+            else if (state.totalXp >= 150) rank = { name: "Österreich-Profi", icon: "🏔️" };
+            else if (state.totalXp >= 50) rank = { name: "Wissens-Sammler", icon: "📚" };
+            
+            document.getElementById('rank-name').innerText = `Level: ${rank.name}`;
+            document.getElementById('rank-icon').innerText = rank.icon;
+            lucide.createIcons();
+        }
+
+        function showMenu() {
+            state.currentCatIndex = null;
+            document.getElementById('home-btn').classList.add('hidden');
+            const main = document.getElementById('main-content');
+            main.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-3xl text-white shadow-xl">
+                        <h2 class="text-3xl font-black mb-2">Österreich-Challenge</h2>
+                        <p class="text-blue-100">Lerne Fakten und sammle XP!</p>
+                    </div>
+                    <div class="grid gap-4">
+                        ${APP_DATA.map((cat, idx) => `
+                            <button onclick="startStudy(${idx})" class="group flex items-center justify-between p-6 bg-white rounded-2xl border-2 border-slate-100 hover:border-blue-400 hover:shadow-lg transition-all text-left">
+                                <div class="flex items-center gap-4">
+                                    <div class="bg-blue-50 text-blue-600 p-3 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <i data-lucide="book-open"></i>
+                                    </div>
+                                    <h3 class="font-bold text-lg">${cat.category}</h3>
+                                </div>
+                                <i data-lucide="arrow-right" class="text-slate-300"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            updateHeader();
+        }
+
+        function startStudy(index) {
+            state.currentCatIndex = index;
+            document.getElementById('home-btn').classList.remove('hidden');
+            const cat = APP_DATA[index];
+            const main = document.getElementById('main-content');
+            main.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <h2 class="text-3xl font-black text-slate-800">${cat.category}</h2>
+                    <div class="space-y-4">
+                        ${cat.studyContent.map(item => `
+                            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex gap-4">
+                                <div class="bg-yellow-100 text-yellow-600 p-3 rounded-2xl h-fit"><i data-lucide="lightbulb"></i></div>
+                                <div>
+                                    <h4 class="font-black text-blue-900 text-lg mb-1">${item.title}</h4>
+                                    <p class="text-slate-600 text-sm leading-relaxed">${item.text}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="startQuiz()" class="w-full p-6 bg-blue-600 text-white rounded-3xl font-black text-xl shadow-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="play-circle"></i> MISSION STARTEN
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function startQuiz() {
+            state.currentIndex = 0;
+            state.score = 0;
+            state.streak = 0;
+            state.isAnswered = false;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const cat = APP_DATA[state.currentCatIndex];
+            const q = cat.questions[state.currentIndex];
+            const main = document.getElementById('main-content');
+            
+            main.innerHTML = `
+                <div class="space-y-6 fade-in">
+                    <div class="flex justify-between items-center">
+                        <div class="bg-orange-500 text-white px-3 py-1 rounded-lg flex items-center gap-1 font-black">
+                            <i data-lucide="zap" class="w-4 h-4 fill-white"></i> ${state.streak}
+                        </div>
+                        <span class="text-sm font-bold text-slate-400">Frage ${state.currentIndex + 1} / ${cat.questions.length}</span>
+                    </div>
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 space-y-8">
+                        <h2 class="text-2xl font-black text-center">${q.question}</h2>
+                        <div class="grid gap-3" id="options-container">
+                            ${q.options.map((opt, i) => `
+                                <button onclick="handleAnswer(${i})" id="opt-${i}" class="option-btn p-5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-left font-bold transition-all hover:border-blue-300">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="explanation" class="hidden p-4 bg-blue-50 rounded-2xl border-2 border-blue-100 flex gap-3">
+                            <i data-lucide="info" class="text-blue-500 shrink-0"></i>
+                            <p class="text-sm text-slate-700 leading-relaxed">${q.explanation}</p>
+                        </div>
+                    </div>
+                    <button id="next-btn" disabled onclick="nextQuestion()" class="w-full p-6 rounded-3xl font-black text-xl transition-all bg-slate-200 text-slate-400">
+                        WEITER
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function handleAnswer(idx) {
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+            const cat = APP_DATA[state.currentCatIndex];
+            const q = cat.questions[state.currentIndex];
+            const isCorrect = idx === q.correct;
+
+            const btn = document.getElementById(`opt-${idx}`);
+            const correctBtn = document.getElementById(`opt-${q.correct}`);
+            
+            if (isCorrect) {
+                btn.className = "p-5 rounded-2xl border-2 border-green-500 bg-green-50 font-bold flex justify-between items-center";
+                btn.innerHTML += '<i data-lucide="check-circle-2" class="text-green-600"></i>';
+                state.score++;
+                state.totalXp += 15;
+                state.streak++;
+            } else {
+                btn.className = "p-5 rounded-2xl border-2 border-red-500 bg-red-50 font-bold opacity-100";
+                correctBtn.className = "p-5 rounded-2xl border-2 border-green-500 bg-green-50 font-bold flex justify-between items-center";
+                correctBtn.innerHTML += '<i data-lucide="check-circle-2" class="text-green-600"></i>';
+                state.streak = 0;
+            }
+
+            document.getElementById('explanation').classList.remove('hidden');
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = "w-full p-6 rounded-3xl font-black text-xl transition-all bg-blue-600 text-white shadow-xl hover:bg-blue-700";
+            
+            updateHeader();
+            lucide.createIcons();
+        }
+
+        function nextQuestion() {
+            const cat = APP_DATA[state.currentCatIndex];
+            if (state.currentIndex < cat.questions.length - 1) {
+                state.currentIndex++;
+                state.isAnswered = false;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const cat = APP_DATA[state.currentCatIndex];
+            const isPerfect = state.score === cat.questions.length;
+            if (isPerfect) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                state.totalXp += 50;
+            }
+
+            const main = document.getElementById('main-content');
+            main.innerHTML = `
+                <div class="text-center bg-white p-12 rounded-[3rem] shadow-2xl border border-slate-100 fade-in">
+                    <div class="text-7xl mb-4">🏆</div>
+                    <h2 class="text-4xl font-black">FERTIG!</h2>
+                    <p class="text-slate-500 font-bold">Kapitel: ${cat.category}</p>
+                    <div class="flex justify-center items-center gap-12 py-8">
+                        <div>
+                            <div class="text-5xl font-black text-blue-600">${state.score}</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase">Richtig</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-5xl font-black text-amber-500">+${state.score * 15}</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase">XP</div>
+                        </div>
+                    </div>
+                    <button onclick="showMenu()" class="w-full p-6 bg-blue-600 text-white rounded-3xl font-black text-xl hover:bg-blue-700 shadow-xl transition-all">
+                        ZURÜCK ZUM MENÜ
+                    </button>
+                </div>
+            `;
+            updateHeader();
+        }
+
+        // Start
+        window.onload = showMenu;
+    </script>
+</body>
+</html>
